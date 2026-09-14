@@ -1,0 +1,9 @@
+{
+  "name":"廃棄率管理 Ver.1",
+  "short_name":"廃棄率管理",
+  "start_url":"./index.html",
+  "display":"standalone",
+  "background_color":"#f5f8fb",
+  "theme_color":"#10b956",
+  "icons":[{"src":"icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}]
+}
