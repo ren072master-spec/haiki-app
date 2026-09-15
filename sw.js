@@ -1,4 +1,4 @@
-const CACHE='haiki-v4-share';
+const CACHE='haiki-v6-input-share';
 const ASSETS=['./','./index.html','./manifest.webmanifest','./icon.svg'];
 self.addEventListener('install',e=>{self.skipWaiting();e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS)))});
 self.addEventListener('activate',e=>e.waitUntil((async()=>{
