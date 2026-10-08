@@ -1,4 +1,4 @@
-const CACHE='haiki-v10-hourly-analysis-20261008';
+const CACHE='haiki-v11-compensation-20261008';
 const ASSETS=['./','./index.html','./manifest.webmanifest','./icon.svg'];
 self.addEventListener('install',e=>{self.skipWaiting();e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS)))});
 self.addEventListener('activate',e=>e.waitUntil((async()=>{const keys=await caches.keys();await Promise.all(keys.filter(k=>k.startsWith('haiki-')&&k!==CACHE).map(k=>caches.delete(k)));await self.clients.claim()})()));
