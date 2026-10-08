@@ -18,6 +18,12 @@ button,input,select{font:inherit}button{cursor:pointer}.app{max-width:430px;marg
 /* settings */.settings-panel{position:fixed;inset:0;z-index:40;background:rgba(15,23,42,.36);display:none;align-items:flex-end;justify-content:center}.settings-panel.open{display:flex}.sheet{width:min(430px,100%);max-height:88vh;overflow:auto;background:#fff;border-radius:24px 24px 0 0;padding:18px 18px calc(22px + env(safe-area-inset-bottom));box-shadow:0 -20px 50px rgba(15,23,42,.18)}.grab{width:42px;height:5px;background:#d7dde5;border-radius:999px;margin:0 auto 16px}.sheet h2{font-size:19px;margin:0 0 14px}.setting{margin-top:13px}.setting label{font-size:12px;font-weight:900;color:#475569;display:block;margin-bottom:6px}.setting input,.setting select{width:100%;border:1px solid #dfe6ec;border-radius:12px;padding:12px;outline:none}.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}.close-settings{width:100%;border:0;background:var(--green);color:#fff;padding:14px;border-radius:14px;font-weight:900;margin-top:16px}.danger-btn{width:100%;border:1px solid #ffd3d3;background:#fff6f6;color:#c83c3c;padding:12px;border-radius:14px;font-weight:900;margin-top:10px}
 /* nav */.nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(430px,100%);background:rgba(255,255,255,.97);backdrop-filter:blur(14px);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(5,1fr);padding:7px 4px calc(7px + env(safe-area-inset-bottom));z-index:20}.nav button{border:0;background:transparent;color:#7a8796;font-size:10px;font-weight:800;padding:5px 1px}.nav .ico{display:block;font-size:20px;line-height:1.2;margin-bottom:3px}.nav button.active{color:var(--blue)}
 @media(min-width:700px){body{padding:28px 0}.app{min-height:860px;border-radius:28px;overflow:hidden}.topbar{padding-top:14px}.nav{bottom:28px;border-radius:0 0 28px 28px}}
+
+/* Illustrated daily weather */
+.weather-section{background:linear-gradient(135deg,#f4fbff,#e6f4ff);border-color:#d9ebf7;overflow:hidden;color:#12304c}
+.weather-heading{display:flex;align-items:center;justify-content:space-between;gap:12px}.weather-heading .section-title{margin:0;font-size:15px}.weather-settings,.weather-refresh{border:0;background:transparent;color:#396783;font-size:12px;padding:8px;min-height:36px;border-radius:8px}.weather-settings:focus-visible,.weather-refresh:focus-visible{outline:2px solid #1197df;outline-offset:2px}
+.weather-content{display:flex;align-items:center;gap:14px;padding:12px 0 8px}.weather-art{width:118px;flex:0 0 118px;filter:drop-shadow(0 7px 8px #527e9d20)}.weather-art svg{display:block;width:100%;height:auto}.weather-copy{min-width:0}.weather-date{font-size:11px;color:#5c748b;margin-bottom:5px}.weather-condition{font-size:15px;font-weight:800}.weather-temp{font-size:36px;font-weight:800;letter-spacing:-1.4px;line-height:1.15;margin:4px 0}.weather-temp small{font-size:19px;letter-spacing:0}.weather-measure{font-size:11px;color:#5c748b}.weather-rain{font-size:12px;margin-top:7px}.weather-source{font-size:10px;color:#647b90;margin:4px 0 0}.weather-footer{display:flex;justify-content:space-between;align-items:center;border-top:1px solid #cfe3f0;margin-top:8px;padding-top:5px}.weather-footer a{font-size:10px;color:#5c748b;text-decoration:none}.weather-status{font-size:11px;line-height:1.6;color:#64748b;margin:4px 0 0}.weather-status:empty{display:none}.weather-empty .weather-condition{font-size:14px}.weather-preferences h3{font-size:15px}.weather-preferences label{line-height:1.7}.weather-preferences input[type=checkbox]{width:auto}.weather-preferences input[type=number],.weather-preferences input[type=password]{margin-top:4px}.weather-note{display:block;font-size:11px;line-height:1.7;color:#64748b;margin-top:10px}
+@media(max-width:350px){.weather-art{width:94px;flex-basis:94px}.weather-content{gap:10px}.weather-temp{font-size:30px}}
 </style>
 </head>
 <body>
@@ -34,7 +40,7 @@ button,input,select{font:inherit}button{cursor:pointer}.app{max-width:430px;marg
         <div class="metric"><div class="k">月末予測</div><div class="v" id="landingRate">0.00%</div><div class="sub" id="landingSub">算出待ち</div></div>
       </div>
       <div class="section"><h2 class="section-title">今月の進捗</h2><div class="progress-row"><span><b id="progressRate">0.00%</b> / 目標 <span id="progressTarget">2.80%</span></span><span id="progressDiff">±0.00pt</span></div><div class="bar"><div class="bar-fill" id="progressFill" style="width:0%"></div><div class="bar-target" id="targetMarker" style="left:70%"></div></div><div class="message"><div class="face" id="face">🙂</div><div><b id="messageTitle">この調子でいきましょう！</b><small id="messageText">目標達成に向けて順調です。</small></div></div><button class="share-btn" id="openShare"><span>⇧</span>進捗を共有</button><button class="quick" id="quickInput">今日の数字を入力する</button></div>
-      <div class="section"><h2 class="section-title">店舗の天気</h2><div id="weatherToday"></div><p id="weatherStatus" style="font-size:12px;color:#64748b" role="status"></p><div class="row2"><label>緯度<input id="weatherLat" type="number" step="any" style="width:100%"></label><label>経度<input id="weatherLon" type="number" step="any" style="width:100%"></label></div><label style="display:block;margin:10px 0">Open-Meteo APIキー（商用契約用・任意）<input id="weatherApiKey" type="password" autocomplete="off" style="width:100%" placeholder="端末内保存・バックアップ対象外"></label><label><input id="weatherAuto" type="checkbox"> 起動・月切替時に自動取得</label><button class="quick" id="saveWeather">地点・自動取得を保存</button><button class="share-cancel" id="fetchWeather">表示月の天気を取得・更新</button><small>初期地点：神谷町付近。店舗の座標を指定してください。<br>天気：<a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo</a>（過去は再解析・直近は予報）。店舗の業務利用は<a href="https://open-meteo.com/en/pricing" target="_blank" rel="noopener">商用契約</a>をご確認ください。</small></div><div class="section"><h2 class="section-title">管理者計画と着地見込み</h2><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px"><label>月間売上目標<input id="planSales" type="number" min="0" placeholder="例 10500000" style="width:100%;padding:10px;border:1px solid #cbd5e1;border-radius:10px"></label><label>管理者売上予測<input id="planEstimate" type="number" min="0" placeholder="例 10200000" style="width:100%;padding:10px;border:1px solid #cbd5e1;border-radius:10px"></label></div><button id="savePlan" class="quick" style="margin:10px 0">この月の計画を保存</button><div id="planResult" style="font-size:13px;line-height:2;color:#334155"></div></div><div class="section"><h2 class="section-title">実績サマリー</h2><div class="detail-row"><span>累計売上</span><b id="salesTotal">¥0</b></div><div class="detail-row"><span>精算上の累計廃棄</span><b id="wasteTotal">¥0</b></div><div class="detail-row"><span>実廃棄（廃棄日ベース）</span><b id="actualWasteTotal">¥0</b></div><div class="detail-row"><span>日商平均</span><b id="avgSales">¥0</b></div><div class="detail-row"><span>月末売上予測</span><b id="projectedSales">¥0</b></div></div>
+      <div class="section weather-section"><div class="weather-heading"><h2 class="section-title">店舗の天気</h2><button class="weather-settings" id="openWeatherSettings" aria-label="天気の設定を開く">設定 <span aria-hidden="true">↗</span></button></div><div id="weatherToday" aria-live="polite"></div><div class="weather-footer"><a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo</a><button id="refreshWeather" class="weather-refresh">更新 ↻</button></div><p id="weatherStatus" class="weather-status" role="status"></p></div><div class="section"><h2 class="section-title">管理者計画と着地見込み</h2><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px"><label>月間売上目標<input id="planSales" type="number" min="0" placeholder="例 10500000" style="width:100%;padding:10px;border:1px solid #cbd5e1;border-radius:10px"></label><label>管理者売上予測<input id="planEstimate" type="number" min="0" placeholder="例 10200000" style="width:100%;padding:10px;border:1px solid #cbd5e1;border-radius:10px"></label></div><button id="savePlan" class="quick" style="margin:10px 0">この月の計画を保存</button><div id="planResult" style="font-size:13px;line-height:2;color:#334155"></div></div><div class="section"><h2 class="section-title">実績サマリー</h2><div class="detail-row"><span>累計売上</span><b id="salesTotal">¥0</b></div><div class="detail-row"><span>精算上の累計廃棄</span><b id="wasteTotal">¥0</b></div><div class="detail-row"><span>実廃棄（廃棄日ベース）</span><b id="actualWasteTotal">¥0</b></div><div class="detail-row"><span>日商平均</span><b id="avgSales">¥0</b></div><div class="detail-row"><span>月末売上予測</span><b id="projectedSales">¥0</b></div></div>
     </section>
 
     <section class="view" id="inputView">
@@ -89,7 +95,7 @@ button,input,select{font:inherit}button{cursor:pointer}.app{max-width:430px;marg
   <div class="setting"><label>目標廃棄率（%）</label><input id="targetSetting" type="number" min="0.1" max="20" step="0.1" /></div>
   <div class="setting"><label>精算調整（自動）</label><div id="settlementAdjustment" style="background:#f5f8fb;border:1px solid #e7edf3;border-radius:12px;padding:12px;font-size:13px;font-weight:800;line-height:1.8;color:#475569">計算中…</div><small style="display:block;margin-top:6px;color:#64748b;font-weight:700;line-height:1.5">廃棄は精算システムの表示日で入力し、1暦日前を実廃棄日として自動集計します。</small></div>
   <div class="setting"><label>臨休日（日付だけ・カンマ区切り）</label><input id="closuresSetting" placeholder="例：5, 18" /><small style="display:block;margin-top:6px;color:#64748b;font-weight:700">対象月だけに適用されます。土日祝は入力不要です。</small></div>
-  <button class="close-settings" id="saveSettings">設定を保存</button>
+  <div class="setting weather-preferences"><h3>天気の設定</h3><div class="row2"><label>緯度<input id="weatherLat" type="number" step="any" style="width:100%"></label><label>経度<input id="weatherLon" type="number" step="any" style="width:100%"></label></div><label style="display:block;margin:10px 0">Open-Meteo APIキー（商用契約用・任意）<input id="weatherApiKey" type="password" autocomplete="off" style="width:100%" placeholder="端末内保存・バックアップ対象外"></label><label><input id="weatherAuto" type="checkbox"> 起動・月切替時に自動取得</label><button class="quick" id="saveWeather">地点・自動取得を保存</button><button class="share-cancel" id="fetchWeather">表示月の天気を取得・更新</button><small class="weather-note">初期地点：神谷町付近。店舗の座標を指定してください。<br>天気：<a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo</a>（過去は再解析・直近は予報）。店舗の業務利用は<a href="https://open-meteo.com/en/pricing" target="_blank" rel="noopener">商用契約</a>をご確認ください。</small></div><button class="close-settings" id="saveSettings">設定を保存</button>
   <div class="setting" style="margin-top:18px;padding-top:16px;border-top:1px solid #e7edf3">
     <label>データのバックアップ・移行</label>
     <small style="display:block;margin:0 0 10px;color:#64748b;font-weight:700;line-height:1.5">入力済みの日商・廃棄・設定を1つのファイルに保存できます。機種変更や更新時の移行にも使えます。</small>
@@ -214,9 +220,52 @@ function weatherConfig(){return state.weatherConfig||{lat:35.663,lon:139.745,aut
 function weatherPoint(c=weatherConfig()){return `${Number(c.lat).toFixed(4)},${Number(c.lon).toFixed(4)}`}
 function weatherRecord(k){const r=state.weatherData?.[k];return r&&r.point===weatherPoint()?r:null}
 function weatherKind(code){if(code===null||code===undefined)return '不明';if(code<=1)return '晴れ';if(code<=3||code===45||code===48)return '曇り';if([71,73,75,77,85,86].includes(code))return '雪';return '雨'}
+function weatherVisual(code){
+ if(!Number.isInteger(code))return {id:'unknown',label:'天気は未取得'};
+ if(code===0||code===1)return {id:'sun',label:'晴れ'};
+ if(code===2)return {id:'partly',label:'晴れ時々曇り'};
+ if(code===3)return {id:'cloud',label:'曇り'};
+ if(code===45||code===48)return {id:'fog',label:'霧'};
+ if([51,53,55,56,57,61,63,65,66,67,80,81,82].includes(code))return {id:'rain',label:'雨'};
+ if([71,73,75,77,85,86].includes(code))return {id:'snow',label:'雪'};
+ if([95,96,97,99].includes(code))return {id:'storm',label:'雷雨'};
+ return {id:'unknown',label:'天気不明'};
+}
+function weatherIllustration(kind){
+ const sun='<g stroke="#f4bd4c" stroke-width="4" stroke-linecap="round"><path d="M60 13v-7m0 94v-7M20 53h-7m94 0h-7M32 25l-5-5m66 66-5-5M32 81l-5 5m66-66-5 5"/><circle cx="60" cy="53" r="27" fill="url(#weatherSun)" stroke="none"/></g>';
+ const cloud='<path d="M37 83c-13 0-21-8-21-19 0-11 8-19 19-20 3-17 17-27 32-24 12 2 20 11 23 23 14-1 25 8 25 20 0 12-9 20-23 20Z" fill="url(#weatherCloud)" stroke="#b9d2e5" stroke-width="1"/>';
+ let art='';
+ if(kind==='sun')art=sun;
+ else if(kind==='partly')art='<g transform="translate(-13 -7) scale(.85)">'+sun+'</g><g transform="translate(10 20) scale(.85)">'+cloud+'</g>';
+ else if(kind==='unknown')art='<circle cx="65" cy="62" r="37" fill="#e1edf5"/><text x="65" y="76" text-anchor="middle" font-size="43" font-family="sans-serif" fill="#88a3ba">?</text>';
+ else {art='<g transform="translate(2 -1)">'+cloud+'</g>';
+ if(kind==='rain')art+='<path d="m43 93-5 10m28-10-5 10m28-10-5 10" stroke="#58aeea" stroke-width="5" stroke-linecap="round"/>';
+ if(kind==='snow')art+='<g stroke="#70aed2" stroke-width="2" stroke-linecap="round"><path d="M42 92v14m-6-10 12 6m-12 0 12-6M76 92v14m-6-10 12 6m-12 0 12-6"/></g>';
+ if(kind==='storm')art+='<path d="m66 75-16 22h13l-5 18 24-28H68l8-12Z" fill="#f6c44b"/>';
+ if(kind==='fog')art+='<path d="M22 90h88M33 100h66" stroke="#aac3d5" stroke-width="4" stroke-linecap="round"/>';
+ }
+ return '<svg viewBox="0 0 130 120" aria-hidden="true" focusable="false"><defs><radialGradient id="weatherSun" cx="35%" cy="25%" r="80%"><stop stop-color="#ffeaa1"/><stop offset="1" stop-color="#ffc342"/></radialGradient><linearGradient id="weatherCloud" x2=".4" y2="1"><stop stop-color="#ffffff"/><stop offset="1" stop-color="#dcecf8"/></linearGradient></defs>'+art+'</svg>';
+}
+function renderWeatherCard(r,day){
+ const visual=weatherVisual(r?.code),box=document.getElementById('weatherToday');
+ box.className=r?'':'weather-empty';box.replaceChildren();
+ const content=document.createElement('div');content.className='weather-content';
+ const art=document.createElement('div');art.className='weather-art';art.innerHTML=weatherIllustration(visual.id);
+ const copy=document.createElement('div');copy.className='weather-copy';
+ const add=(tag,cls,value)=>{const el=document.createElement(tag);el.className=cls;el.textContent=value;copy.appendChild(el);return el};
+ const week='日月火水木金土'[new Date(state.year,state.month-1,day).getDay()];
+ add('div','weather-date',`${state.month}月${day}日（${week}）`);
+ add('div','weather-condition',visual.label);
+ const number=value=>typeof value==='number'&&Number.isFinite(value)?String(Math.round(value*10)/10):'—';
+ if(r){add('div','weather-measure','最高気温');const temp=add('div','weather-temp',number(r.max));const unit=document.createElement('small');unit.textContent='℃';temp.appendChild(unit);add('div','weather-rain',`降水量 ${number(r.rain)} mm`);add('div','weather-source',r.source==='archive'?'過去再解析':'予報・直近推計');}
+ else {add('div','weather-source','「更新」で天気を取得できます');}
+ content.append(art,copy);box.appendChild(content);
+}
 function weatherLabel(r){return r?`${weatherKind(r.code)} ／ ${r.max==null?'—':r.max+'℃'} ／ 降水 ${r.rain==null?'—':r.rain+'mm'}（${r.source==='archive'?'過去再解析':'予報・直近推計'}）`:'未取得'}
 function renderWeather(){const c=weatherConfig();const apiInput=document.getElementById('weatherApiKey');if(document.activeElement!==apiInput)apiInput.value=weatherApiKey();for(const [id,val] of [['weatherLat',c.lat],['weatherLon',c.lon]]){const e=document.getElementById(id);if(document.activeElement!==e)e.value=val}document.getElementById('weatherAuto').checked=c.auto;
- const k=keyDate(state.year,state.month,selectedDay);document.getElementById('weatherToday').textContent=`${state.month}/${selectedDay}：${weatherLabel(weatherRecord(k))}`;
+ const k=keyDate(state.year,state.month,selectedDay);
+ const homeDay=state.year===now.getFullYear()&&state.month===now.getMonth()+1?now.getDate():selectedDay;
+ renderWeatherCard(weatherRecord(keyDate(state.year,state.month,homeDay)),homeDay);
  const inputK=keyDate(state.year,state.month,inputDay);let el=document.getElementById('inputWeather');if(!el){el=document.createElement('p');el.id='inputWeather';el.style.cssText='font-size:12px;color:#475569';document.getElementById('inputDateLabel').after(el)}el.textContent=`当日の天気：${weatherLabel(weatherRecord(inputK))}`;
  const detail=document.getElementById('calendarDetail');let wd=document.createElement('p');wd.style.cssText='font-size:12px;color:#475569';wd.textContent='天気：'+weatherLabel(weatherRecord(k));detail.appendChild(wd);
  renderWeatherAnalysis();
@@ -228,10 +277,12 @@ function weatherGroups(){const out={};let excluded=0;
  }return{groups:out,excluded};
 }
 function renderWeatherAnalysis(){const {groups,excluded}=weatherGroups(),box=document.getElementById('weatherAnalysis');box.innerHTML='';const table=document.createElement('table');table.className='weekly';table.innerHTML='<thead><tr><th>天気</th><th>日数</th><th>平均日商</th><th>実廃棄率</th></tr></thead>';const body=document.createElement('tbody');for(const [kind,x] of Object.entries(groups)){const tr=document.createElement('tr');for(const v of [kind,x.days+'日',yen(x.sales/x.days),pct(x.waste/x.sales)]){const td=document.createElement('td');td.textContent=v;tr.appendChild(td)}body.appendChild(tr)}table.appendChild(body);box.appendChild(table);const note=document.createElement('p');note.style.cssText='font-size:12px;line-height:1.8;color:#64748b';note.textContent=`表示月の営業日を実廃棄日で集計。廃棄率＝合計実廃棄÷合計売上。再解析天気・売上・翌日精算額が揃った日だけを採用（除外 ${excluded}日）。${Object.keys(groups).length?'':'表示月の過去天気を取得してください。'} 曜日や販促の影響を含む参考比較で、天気による因果関係は示しません。各区分3日未満はサンプル不足です。`;box.appendChild(note)}
+document.getElementById('openWeatherSettings').onclick=()=>{openSettings();document.querySelector('.weather-preferences').scrollIntoView({block:'start'});document.getElementById('weatherLat').focus({preventScroll:true})};
+document.getElementById('refreshWeather').onclick=()=>fetchWeather(true);
 let weatherBusy=false;
 async function fetchWeather(force=false){if(weatherBusy)return;const c={...weatherConfig()},y=state.year,m=state.month,mk=`${y}-${pad(m)}`,point=weatherPoint(c);if(!force&&Date.now()-(state.weatherFetched?.[point+'|'+mk]||0)<6*3600000)return;
  if(!Number.isFinite(Number(c.lat))||Math.abs(Number(c.lat))>90||!Number.isFinite(Number(c.lon))||Math.abs(Number(c.lon))>180)return toast('座標を確認してください');
- weatherBusy=true;const status=document.getElementById('weatherStatus');status.textContent='天気を取得中…';const today=keyDate(now.getFullYear(),now.getMonth()+1,now.getDate()),cut=keyDate(...addCalendarDays(now.getFullYear(),now.getMonth()+1,now.getDate(),-5)),max=keyDate(...addCalendarDays(now.getFullYear(),now.getMonth()+1,now.getDate(),15));
+ weatherBusy=true;document.getElementById('refreshWeather').disabled=true;document.getElementById('refreshWeather').textContent='更新中…';const status=document.getElementById('weatherStatus');status.textContent='天気を取得中…';const today=keyDate(now.getFullYear(),now.getMonth()+1,now.getDate()),cut=keyDate(...addCalendarDays(now.getFullYear(),now.getMonth()+1,now.getDate(),-5)),max=keyDate(...addCalendarDays(now.getFullYear(),now.getMonth()+1,now.getDate(),15));
  const start=keyDate(y,m,1),end=keyDate(y,m,daysInMonth(y,m));const ranges=[];
  if(start<=cut)ranges.push({source:'archive',host:'https://archive-api.open-meteo.com/v1/archive',start,end:end<cut?end:cut});
  const recent=keyDate(...addCalendarDays(now.getFullYear(),now.getMonth()+1,now.getDate(),-4));const fs=start>recent?start:recent,fe=end<max?end:max;if(fs<=fe)ranges.push({source:'forecast',host:'https://api.open-meteo.com/v1/forecast',start:fs,end:fe});
@@ -241,7 +292,7 @@ async function fetchWeather(force=false){if(weatherBusy)return;const c={...weath
  if(weatherPoint()!==point)continue;state.weatherData??={};for(let i=0;i<data.daily.time.length;i++){const k=data.daily.time[i],code=data.daily.weather_code?.[i];if(code==null)continue;state.weatherData[k]={point,code,max:data.daily.temperature_2m_max?.[i]??null,rain:data.daily.precipitation_sum?.[i]??null,source:range.source,fetchedAt:new Date().toISOString()};count++}
  }catch(e){errors.push(range.source==='archive'?'過去天気':'直近天気')}finally{clearTimeout(timer)}}
  if(weatherPoint()===point){if(count){if(!errors.length){state.weatherFetched??={};state.weatherFetched[point+'|'+mk]=Date.now()}saveState()}render();status.textContent=errors.length?`${count}日取得。${errors.join('・')}の取得に失敗しました。通信を確認して再取得してください。保存済み天気は維持しています。`:ranges.length?`${mk}：${count}日取得（${today}時点）。予報範囲外の日は未取得です。`:'この月は予報範囲外です。日付が近づいてから再取得してください。'}
- }finally{weatherBusy=false}
+ }finally{weatherBusy=false;document.getElementById('refreshWeather').disabled=false;document.getElementById('refreshWeather').textContent='更新 ↻'}
 }
 function autoWeather(){if(weatherConfig().auto)fetchWeather(false)}
 document.getElementById('fetchWeather').onclick=()=>fetchWeather(true);
